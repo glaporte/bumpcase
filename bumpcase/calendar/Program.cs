@@ -13,6 +13,8 @@ builder.Services.AddSingleton<CustomerRepository>();
 builder.Services.AddSingleton<PatientRepository>();
 builder.Services.AddSingleton<MeetingRepository>();
 builder.Services.AddSingleton<VeterinarianRepository>();
+builder.Services.AddSingleton<SlotRepository>();
+builder.Services.AddSingleton<MeetingRepository>();
 
 
 var app = builder.Build();

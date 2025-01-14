@@ -32,6 +32,12 @@ namespace calendar.Context
             .HasForeignKey(e => e.VeterinarianId)
             .IsRequired();
 
+            modelBuilder.Entity<Veterinarian>()
+            .HasMany(e => e.Slots)
+            .WithOne(e => e.Veterinarian)
+            .HasForeignKey(e => e.VeterinarianId)
+            .IsRequired();
+
             base.OnModelCreating(modelBuilder);
         }
 

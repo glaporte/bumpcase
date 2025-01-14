@@ -7,9 +7,7 @@ namespace calendar.Repository
     {
         public VeterinarianRepository()
         {
-            using (var context = new VeterinarianContext())
-            {
-                var vetenerians = new List<Veterinarian>
+            var vetenerians = new List<Veterinarian>
                 {
                     new Veterinarian
                     {
@@ -18,9 +16,28 @@ namespace calendar.Repository
                         Address = "0 street na",
                     },
                 };
+            using (var context = new VeterinarianContext())
+            {
 
                 context.Veterinarians.AddRange(vetenerians);
                 context.SaveChanges();
+            }
+            SlotRepository.SetDefaultConfigurationForVeterinarian(vetenerians.First());
+        }
+
+        public List<Veterinarian> GetVeterinarians()
+        {
+            using (var context = new VeterinarianContext())
+            {
+                return context.Veterinarians.ToList();
+            }
+        }
+
+        public Veterinarian? GetVeterinarian(int id)
+        {
+            using (var context = new VeterinarianContext())
+            {
+                return context.Veterinarians.Where(x => x.Id == id).FirstOrDefault();
             }
         }
     }

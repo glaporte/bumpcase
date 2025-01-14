@@ -1,6 +1,8 @@
 ﻿using calendar.Entites;
 using calendar.Repository;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace calendar.Controllers
 {
@@ -8,6 +10,14 @@ namespace calendar.Controllers
     [Route("[controller]")]
     public class MeetingController : ControllerBase
     {
+        [BindProperties]
+        public class MeetingParameter
+        {
+            public Meeting Meeting { get; set; } = null!;
+            public DateTime Start {  get; set; }
+            public DateTime End { get; set; }
+        }
+
         private readonly ILogger<MeetingController> _logger;
         private readonly MeetingRepository _meetingRepository;
 
@@ -18,17 +28,37 @@ namespace calendar.Controllers
         }
 
         [HttpPost]
-        [Produces(typeof(Patient))]
-        public async Task<IActionResult> ScheduleMeeting(Meeting patient)
+        [Produces(typeof(Meeting))]
+        public async Task<IActionResult> AddMeeting(Meeting meeting)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _meetingRepository.AddMeeting(patient);
+            _meetingRepository.AddMeeting(meeting);
 
-            return Ok(patient);
+            return Ok(meeting);
+        }
+
+        [HttpPost]
+        [Route("schedule")]
+        [Produces(typeof(Meeting))]
+        public async Task<IActionResult> ScheduleMeeting([FromBody] MeetingParameter meeting)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _meetingRepository.AddMeetingWithCustomDate(meeting);
+            return Ok(meeting);
+        }
+
+        [HttpGet]
+        public ActionResult<List<Meeting>> Get(int veteId)
+        {
+            return Ok(_meetingRepository.GetMeetings(veteId));
         }
     }
 }

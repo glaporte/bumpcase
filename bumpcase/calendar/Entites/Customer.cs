@@ -10,6 +10,7 @@ namespace calendar.Entites
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int Id { get; set; }
         public string Lastname { get; set; } = string.Empty;
         public string Firstname { get; set; } = string.Empty;

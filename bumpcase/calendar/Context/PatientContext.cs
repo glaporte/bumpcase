@@ -20,7 +20,6 @@ namespace calendar.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Patient>().ToTable(nameof(Patient));
-            //modelBuilder.Entity<Patient>().HasIndex(e => new { e.OwnerId, e.Name }).IsUnique();
 
             modelBuilder.Entity<Patient>()
             .HasMany(e => e.Meetings)

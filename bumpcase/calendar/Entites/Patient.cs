@@ -10,6 +10,7 @@ namespace calendar.Entites
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int Id { get; set; }
 
         public enum PatientFamily

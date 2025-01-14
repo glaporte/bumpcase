@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace calendar.Entites
 {
@@ -8,6 +9,7 @@ namespace calendar.Entites
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
         public int Id { get; set; }
         public string Lastname { get; set; } = string.Empty;
         public string Firstname { get; set; } = string.Empty;

@@ -9,6 +9,10 @@ namespace calendar.Entites
     [Index(nameof(Start), nameof(End), nameof(VeterinarianId))]
     public class Slot
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [JsonIgnore]
+        public int Id { get; set; }
         public enum SlotState
         {
             Closed,
@@ -25,6 +29,15 @@ namespace calendar.Entites
         public int VeterinarianId { get; set; }
         [JsonIgnore]
         public Veterinarian? Veterinarian { get; set; }
+
+        public Slot() { }
+        public Slot(DateTime start, DateTime end, int veteId, SlotState state)
+        {
+            Start = start;
+            End = end;
+            VeterinarianId = veteId;
+            State = state;
+        }
 
     }
 }
