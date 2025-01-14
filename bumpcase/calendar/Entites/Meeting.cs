@@ -13,8 +13,8 @@ namespace calendar.Entites
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonIgnore]
         public int Id { get; set; }
-        public string MeetingPurpose { get; set; }
-        public string Report {  get; set; }
+        public string MeetingPurpose { get; set; } = string.Empty;
+        public string Report { get; set; } = string.Empty;
 
         [Required]
         [ForeignKey("Slot")]

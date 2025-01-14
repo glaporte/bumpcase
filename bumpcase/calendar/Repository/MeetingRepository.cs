@@ -37,7 +37,6 @@ namespace calendar.Repository
             return meeting;
         }
 
-
         public Meeting AddMeetingWithCustomDate(MeetingParameter meetingParameter)
         {
             // clamp sec and min
@@ -111,7 +110,18 @@ namespace calendar.Repository
 
                 SlotRepository.ResetAndMergeSlot(meeting.SlotId);
 
-                SlotRepository.SplitSlot(targetSlot!, meetingUpdate.Start, meetingUpdate.End);
+                try
+                {
+                    SlotRepository.SplitSlot(targetSlot!, meetingUpdate.Start, meetingUpdate.End);
+                }
+                catch (Exception) // rollback initial slot due to bad rescheduling date
+                {
+                    var restoredSlot = SlotRepository.AddSlot(new Slot(previousSlot.Start, previousSlot.End, previousSlot.VeterinarianId, Slot.SlotState.Booked));
+                    meeting.SlotId = restoredSlot.Id;
+                    context.SaveChanges();
+
+                    throw;
+                }
                 targetSlot = SlotRepository.FindSlot(meetingUpdate.Start, meeting.VeterinarianId);
                 if (targetSlot == null)
                 {
@@ -123,7 +133,6 @@ namespace calendar.Repository
 
                 return meeting;
             }
-
         }
 
         public List<Meeting> GetMeetings(int veneId)

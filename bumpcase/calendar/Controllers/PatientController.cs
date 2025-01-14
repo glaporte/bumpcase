@@ -19,7 +19,7 @@ namespace calendar.Controllers
 
         [HttpPost]
         [Produces(typeof(Patient))]
-        public async Task<IActionResult> AddPatient(Patient patient)
+        public IActionResult AddPatient(Patient patient)
         {
             if (!ModelState.IsValid)
             {

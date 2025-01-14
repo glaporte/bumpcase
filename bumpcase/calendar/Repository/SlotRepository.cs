@@ -27,6 +27,17 @@ namespace calendar.Repository
             }
         }
 
+        public Slot AddSlot(Slot slot)
+        {
+            using (var context = new SlotContext())
+            {
+                context.Slots.Add(slot);
+                context.SaveChanges();
+
+                return slot;
+            }
+        }
+
         public Slot? GetSlot(int id)
         {
             using (var context = new SlotContext())

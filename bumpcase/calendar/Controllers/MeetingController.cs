@@ -35,30 +35,43 @@ namespace calendar.Controllers
 
         [HttpPost]
         [Produces(typeof(Meeting))]
-        public async Task<IActionResult> AddMeeting(Meeting meeting)
+        public IActionResult AddMeeting(Meeting meeting)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _meetingRepository.AddMeeting(meeting);
-
-            return Ok(meeting);
+            try
+            {
+                _meetingRepository.AddMeeting(meeting);
+                return Ok(meeting);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
         [Route("schedule")]
         [Produces(typeof(Meeting))]
-        public async Task<IActionResult> ScheduleMeeting([FromBody] MeetingParameter meeting)
+        public IActionResult ScheduleMeeting([FromBody] MeetingParameter meeting)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _meetingRepository.AddMeetingWithCustomDate(meeting);
-            return Ok(meeting);
+            try
+            {
+                _meetingRepository.AddMeetingWithCustomDate(meeting);
+                return Ok(meeting);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
@@ -93,7 +106,7 @@ namespace calendar.Controllers
         [HttpPut]
         [Route("reschedule")]
         [Produces(typeof(Meeting))]
-        public async Task<IActionResult> ReScheduleMeeting([FromBody] MeetingUpdateParameter meetingParameter)
+        public IActionResult ReScheduleMeeting([FromBody] MeetingUpdateParameter meetingParameter)
         {
             var meeting = _meetingRepository.GetMeeting(meetingParameter.MeetingId);
             if (meeting == null)
