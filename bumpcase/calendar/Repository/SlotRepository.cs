@@ -1,5 +1,7 @@
 ﻿using calendar.Context;
 using calendar.Entites;
+using static System.Reflection.Metadata.BlobBuilder;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace calendar.Repository
 {
@@ -95,6 +97,50 @@ namespace calendar.Repository
             }
 
             return true;
+        }
+
+        public void ResetAndMergeSlot(int slotId)
+        {
+            using (var context = new SlotContext())
+            {
+                var initialSlot = context.Slots.Where(x => x.Id == slotId).FirstOrDefault();
+                if (initialSlot == null)
+                    throw new Exception($"Cannot find slot {slotId}");
+
+                var neighbourSlots = context.Slots.Where(x => x.VeterinarianId == initialSlot.VeterinarianId
+                    && x.State == Slot.SlotState.Available
+                    && (x.End == initialSlot.Start || x.Start == initialSlot.End)
+                    && x.Id != initialSlot.Id).ToList();
+
+                Slot newSlot = null!;
+
+                if (neighbourSlots.Count == 0)
+                {
+                    newSlot = new Slot(initialSlot.Start, initialSlot.End, initialSlot.VeterinarianId, Slot.SlotState.Available);
+                }
+                else if (neighbourSlots.Count == 1 && neighbourSlots[0].End < initialSlot.End)
+                {
+                    newSlot = new Slot(neighbourSlots[0].Start, initialSlot.End, initialSlot.VeterinarianId, Slot.SlotState.Available);
+                }
+                else if (neighbourSlots.Count == 1 && neighbourSlots[0].Start > initialSlot.Start)
+                {
+                    newSlot = new Slot(initialSlot.Start, neighbourSlots[0].End, initialSlot.VeterinarianId, Slot.SlotState.Available);
+                }
+                else if (neighbourSlots.Count == 2)
+                {
+                    newSlot = new Slot(new DateTime(Math.Min(neighbourSlots[0].Start.Ticks, neighbourSlots[1].Start.Ticks)),
+                        new DateTime(Math.Min(neighbourSlots[0].End.Ticks, neighbourSlots[1].End.Ticks)),
+                        initialSlot.VeterinarianId, Slot.SlotState.Available);
+                }
+
+                context.Slots.Remove(initialSlot);
+                if (neighbourSlots.Count > 0)
+                    context.Slots.RemoveRange(neighbourSlots);
+                context.SaveChanges();
+
+                context.Slots.AddRange(newSlot);
+                context.SaveChanges();
+            }
         }
 
         public void UpdateSlotState(int slotId, Slot.SlotState state)

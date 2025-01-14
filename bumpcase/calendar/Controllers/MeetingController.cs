@@ -14,7 +14,7 @@ namespace calendar.Controllers
         public class MeetingParameter
         {
             public Meeting Meeting { get; set; } = null!;
-            public DateTime Start {  get; set; }
+            public DateTime Start { get; set; }
             public DateTime End { get; set; }
         }
 
@@ -55,10 +55,33 @@ namespace calendar.Controllers
             return Ok(meeting);
         }
 
+
+        [HttpDelete]
+        public ActionResult<List<Meeting>> CancelMeeting(int meetingId)
+        {
+            try
+            {
+                _meetingRepository.CancelMeeting(meetingId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet]
         public ActionResult<List<Meeting>> Get(int veteId)
         {
-            return Ok(_meetingRepository.GetMeetings(veteId));
+            try
+            {
+                var meetings = _meetingRepository.GetMeetings(veteId);
+                return Ok(meetings);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

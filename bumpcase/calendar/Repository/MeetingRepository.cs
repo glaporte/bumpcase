@@ -26,7 +26,7 @@ namespace calendar.Repository
                 }
                 else if (slot.State != Slot.SlotState.Available)
                 {
-                    throw new ArgumentException ($"Slot is not available.");
+                    throw new ArgumentException($"Slot is not available.");
                 }
 
                 SlotRepository.UpdateSlotState(meeting.SlotId, Slot.SlotState.Booked);
@@ -69,6 +69,21 @@ namespace calendar.Repository
             }
 
             return meetingParameter.Meeting;
+        }
+
+        public void CancelMeeting(int meetingId)
+        {
+            using (var context = new MeetingContext())
+            {
+                Meeting? meeting = context.Meetings.Where(x => x.Id == meetingId).FirstOrDefault();
+                if (meeting == null)
+                    throw new ArgumentException("Meeting not found");
+
+                SlotRepository.ResetAndMergeSlot(meeting.SlotId);
+
+                context.Meetings.Remove(meeting);
+                context.SaveChanges();
+            }
         }
 
         public List<Meeting> GetMeetings(int veneId)

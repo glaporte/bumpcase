@@ -35,7 +35,7 @@ namespace calendar.Controllers
             {
                 return BadRequest($"Invalid Veterinarian");
             }
-            return Ok(_slotRepository.GetSlots(vete));
+            return Ok(_slotRepository.GetSlots(vete).OrderBy(x => x.Start));
         }
     }
 }
