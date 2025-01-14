@@ -140,7 +140,7 @@ namespace calendar.Repository
                 else if (neighbourSlots.Count == 2)
                 {
                     newSlot = new Slot(new DateTime(Math.Min(neighbourSlots[0].Start.Ticks, neighbourSlots[1].Start.Ticks)),
-                        new DateTime(Math.Min(neighbourSlots[0].End.Ticks, neighbourSlots[1].End.Ticks)),
+                        new DateTime(Math.Max(neighbourSlots[0].End.Ticks, neighbourSlots[1].End.Ticks)),
                         initialSlot.VeterinarianId, Slot.SlotState.Available);
                 }
 
