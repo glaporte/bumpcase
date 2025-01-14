@@ -1,8 +1,6 @@
 ﻿using calendar.Entites;
 using calendar.Repository;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
 
 namespace calendar.Controllers
 {
@@ -14,6 +12,14 @@ namespace calendar.Controllers
         public class MeetingParameter
         {
             public Meeting Meeting { get; set; } = null!;
+            public DateTime Start { get; set; }
+            public DateTime End { get; set; }
+        }
+
+        [BindProperties]
+        public class MeetingUpdateParameter
+        {
+            public int MeetingId { get; set; }
             public DateTime Start { get; set; }
             public DateTime End { get; set; }
         }
@@ -77,6 +83,25 @@ namespace calendar.Controllers
             {
                 var meetings = _meetingRepository.GetMeetings(veteId);
                 return Ok(meetings);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [Route("reschedule")]
+        [Produces(typeof(Meeting))]
+        public async Task<IActionResult> ReScheduleMeeting([FromBody] MeetingUpdateParameter meetingParameter)
+        {
+            var meeting = _meetingRepository.GetMeeting(meetingParameter.MeetingId);
+            if (meeting == null)
+                return BadRequest("meeting not found");
+
+            try
+            {
+                return Ok(_meetingRepository.RescheduleMeeting(meetingParameter));
             }
             catch (Exception ex)
             {

@@ -52,7 +52,7 @@ namespace calendar.Repository
         {
             using (var context = new SlotContext())
             {
-                return context.Slots.Where(x => x.VeterinarianId == veteId && x.Start <= date && x.End >= date).FirstOrDefault();
+                return context.Slots.Where(x => x.VeterinarianId == veteId && x.Start <= date && x.End > date).FirstOrDefault();
             }
         }
 

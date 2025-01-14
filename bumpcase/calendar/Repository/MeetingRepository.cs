@@ -86,11 +86,59 @@ namespace calendar.Repository
             }
         }
 
+        public Meeting RescheduleMeeting(MeetingUpdateParameter meetingUpdate)
+        {
+            // clamp sec and min
+            meetingUpdate.Start = DateUtility.CleanMeetingDate(meetingUpdate.Start);
+            meetingUpdate.End = DateUtility.CleanMeetingDate(meetingUpdate.End);
+
+            using (var context = new MeetingContext())
+            {
+                Meeting? meeting = context.Meetings.Where(x => x.Id == meetingUpdate.MeetingId).FirstOrDefault();
+                if (meeting == null)
+                    throw new ArgumentException("Meeting not found");
+
+                var previousSlot = SlotRepository.GetSlot(meeting.SlotId)!;
+                var targetSlot = SlotRepository.FindSlot(meetingUpdate.Start, meeting.VeterinarianId);
+                if (targetSlot == null)
+                {
+                    throw new ArgumentException("Cannot find slot");
+                }
+                if (targetSlot.State != Slot.SlotState.Available)
+                {
+                    throw new ArgumentException("Slot is not available");
+                }
+
+                SlotRepository.ResetAndMergeSlot(meeting.SlotId);
+
+                SlotRepository.SplitSlot(targetSlot!, meetingUpdate.Start, meetingUpdate.End);
+                targetSlot = SlotRepository.FindSlot(meetingUpdate.Start, meeting.VeterinarianId);
+                if (targetSlot == null)
+                {
+                    throw new ArgumentException("Something went wront on re-arranging slot");
+                }
+                SlotRepository.UpdateSlotState(targetSlot.Id, Slot.SlotState.Booked);
+                meeting.SlotId = targetSlot.Id;
+                context.SaveChanges();
+
+                return meeting;
+            }
+
+        }
+
         public List<Meeting> GetMeetings(int veneId)
         {
             using (var context = new MeetingContext())
             {
                 return context.Meetings.Where(x => x.VeterinarianId == veneId).ToList();
+            }
+        }
+
+        public Meeting? GetMeeting(int meetingId)
+        {
+            using (var context = new MeetingContext())
+            {
+                return context.Meetings.Where(x => x.Id == meetingId).FirstOrDefault();
             }
         }
     }
